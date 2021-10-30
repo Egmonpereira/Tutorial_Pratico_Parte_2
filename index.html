@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -52,8 +53,8 @@
             }
             var shaderProgram;
             function iniciarShaders()   {
-                var vertexShader = getShader(gl, "shader-vs");
-                var fragmentShader = getShader(gl, "shader-fs");
+                var vertexShader = getShader(gl, "#shader-vs");
+                var fragmentShader = getShader(gl, "#shader-fs");
                 
                 shaderProgram = gl.createProgram();
                 gl.attachShader(shaderProgram, vertexShader);
@@ -68,22 +69,19 @@
                 
                 shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
                 gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-
-                shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor"); 
-                gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
                 
                 shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
                 shaderProgram.vMatrixUniform = gl.getUniformLocation(shaderProgram, "uVMatrix");
                 shaderProgram.mMatrixUniform = gl.getUniformLocation(shaderProgram, "uMMatrix");
                     
             }
-    
+
             function getShader(gl, id)  {
                 var shaderScript = $(id)[0];
-                if(!shaderScript) {
+                if(!shaderScript)   {
                     return null;
                 }
-      
+
                 var str = "";
                 var k = shaderScript.firstChild;
                 while(k)    {
@@ -91,7 +89,7 @@
                         str += k.textContent;
                         k = k.nextSibling;
                 }
-                
+
                 var shader;
                 if(shaderScript.type == "x-shader/x-fragment")  {
                     shader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -102,7 +100,7 @@
                 else    {
                     return null;
                 }
-                
+
                 gl.shaderSource(shader, str);
                 gl.compileShader(shader);
                 
@@ -130,7 +128,10 @@
       
                 shaderProgram.vertexPositionAttribute = gl.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
                 gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-      
+                
+                shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
+                gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+
                 shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
                 shaderProgram.vMatrixUniform = gl.getUniformLocation(shaderProgram, "uVMatrix");
                 shaderProgram.mMatrixUniform = gl.getUniformLocation(shaderProgram, "uMMatrix");
@@ -148,7 +149,6 @@
                 triangleVertexPositionBuffer.itemSize = 3;
                 triangleVertexPositionBuffer.numItems = 3;
                 
-                /*--Adicione estas linhas abaixo--*/
                 triangleVertexColorBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
                 var cores = [
@@ -159,7 +159,7 @@
                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cores), gl.STATIC_DRAW);
                 triangleVertexColorBuffer.itemSize = 4;
                 triangleVertexColorBuffer.numItems = 3;
-                
+
                 squareVertexPositionBuffer = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
                 vertices = [
@@ -194,26 +194,44 @@
                 mat4.identity(mMatrix);
                 mat4.identity(vMatrix);
                 
-                // Desenhando Triângulo
-                mat4.translate(mMatrix, mMatrix, [-1.5, 0.0, -7.0]);
+                /* Desenhando Triângulo
+                var translation = vec3.create();
+                vec3.set (translation, -1.5, 1.0, -7.0); 
+                mat4.translate(mMatrix, mMatrix, translation);
                 gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
                 gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
                 setMatrixUniforms();
                 gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
+                
+                // Desenhando o Quadrado
+                vec3.set (translation, 3.0, 0.0, 0.0); 
+                mat4.translate(mMatrix, mMatrix, translation);
+                gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+                gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+                setMatrixUniforms();
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);*/
+
+                // Desenhando Triângulo
+                mat4.translate(mMatrix, mMatrix, [-1.5, 0.0, -7.0]);
+                gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
+                gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
                 /*--Adicione estas duas linhas--*/
                 gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
                 gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, triangleVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+                setMatrixUniforms();
+                gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
                 
                 // Desenhando o Quadrado
                 mat4.translate(mMatrix, mMatrix, [3.0, 0.0, 0.0]);
                 gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
                 gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-                setMatrixUniforms();
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);            
                 /*--Adicione estas duas linhas--*/
                 gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
                 gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+                setMatrixUniforms();
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
             }
+
             function setMatrixUniforms()    {
                 gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
                 gl.uniformMatrix4fv(shaderProgram.vMatrixUniform, false, vMatrix);
@@ -224,38 +242,37 @@
         <script id="shader-vs" type="x-shader/x-vertex"> 
             attribute vec3 aVertexPosition;
             attribute vec4 aVertexColor;
-            
+
             uniform mat4 uMMatrix;
             uniform mat4 uVMatrix;
-            uniform mat4 uPMatrix;
+            uniform mat4 uPMatrix;    
             
             varying vec4 vColor;
 
-            void main(void) {
-                gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
+            void main(void) 
+            {
+                gl_Position = uPMatrix * uVMatrix * uMMatrix *
+                vec4(aVertexPosition, 1.0);
                 vColor = aVertexColor;
             }
-
         </script>
 
         <script id="shader-fs" type="x-shader/x-fragment">
             precision mediump float;
-
-            varying vec4 vColor;
-        
+            
             void main(void) {
-                gl_FragColor = vColor;
-                gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
             }
         </script>
     </head>
     <body>
         <center>
             <canvas id="canvas-webgl" 
-            width="500px" 
-            height="500px" 
+            width="768px" 
+            height="432px" 
             style="border:none">
             </canvas>
+            <p>768 x 432 = 16:9</p>
         </center>
     </body>
 </html>
